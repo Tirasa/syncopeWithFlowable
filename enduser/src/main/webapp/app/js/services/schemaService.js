@@ -19,32 +19,32 @@
 
 'use strict';
 
-angular.module( 'self' )
-        .factory( 'SchemaService', [ '$q', '$http',
-          function ( $q, $http ) {
+angular.module('self')
+        .factory('SchemaService', ['$q', '$http',
+          function ($q, $http) {
 
-            var schemaService = { };
+            var schemaService = {};
 
-            schemaService.getUserSchemas = function ( anyTypeClass, sortingFunction ) {
-              var classParam = anyTypeClass ? "?anyTypeClass=" + encodeURI( anyTypeClass ) : "";
-
-              return  $http.get( "/syncope-enduser/api/schemas" + classParam )
-                      .then( function ( response ) {
+            schemaService.getUserSchemas = function (anyTypeClass, sortingFunction) {
+              var classParam = anyTypeClass ? "?anyTypeClass=" + encodeURI(anyTypeClass) : "";
+              return  $http.get("../api/schemas" + classParam)
+                      .then(function (response) {
                         var schemas = response.data;
-                        schemas.plainSchemas.sort( sortingFunction );
-                        schemas.derSchemas.sort( sortingFunction );
-                        schemas.virSchemas.sort( sortingFunction );
+                        if (sortingFunction) {
+                          schemas.plainSchemas.sort(sortingFunction);
+                          schemas.derSchemas.sort(sortingFunction);
+                          schemas.virSchemas.sort(sortingFunction);
+                        }
                         return schemas;
-                      }, function ( response ) {
-                        console.error( "Something went wrong during schema retrieval, exit with status: ", response );
-                        return $q.reject( response.data || response.statusText );
-                      } );
+                      }, function (response) {
+                        console.error("Something went wrong during schema retrieval, exit with status: ", response);
+                        return $q.reject(response.data || response.statusText);
+                      });
             };
 
             schemaService.getTypeExtSchemas = function (group) {
               var param = group ? "?group=" + encodeURI(group) : "";
-
-              return  $http.get("/syncope-enduser/api/schemas" + param)
+              return  $http.get("../api/schemas" + param)
                       .then(function (response) {
                         return response.data;
                       }, function (response) {

@@ -26,11 +26,11 @@ angular.module('self')
             var saml2IdPService = {};
 
             saml2IdPService.getAvailableSAML2IdPs = function () {
-              return $http.get("/syncope-enduser/api/saml2IdPs")
+              return $http.get("../api/saml2IdPs")
                       .then(function (response) {
                         return response.data;
                       }, function (response) {
-                        console.error("Something went wrong during realms retrieval, exit with status: ", response);
+                        console.error("Something went wrong during saml2Idp extesion retrieval, exit with status: ", response);
                         return $q.reject(response.data || response.statusText);
                       });
             };

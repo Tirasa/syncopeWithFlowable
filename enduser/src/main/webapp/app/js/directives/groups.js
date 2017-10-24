@@ -32,12 +32,11 @@ angular.module('self')
                 if (!$scope.user.memberships) {
                   $scope.user.memberships = new Array();
                 }
-                $scope.groupDisabled = false
               };
 
               $scope.addGroup = function (item, model) {
                 var membership = item;
-                $scope.user.memberships.push({"rightKey": membership.rightKey, "groupName": membership.groupName});
+                $scope.user.memberships.push({"groupKey": membership.groupKey, "groupName": membership.groupName});
                 $scope.$emit("groupAdded", membership.groupName);
               };
 

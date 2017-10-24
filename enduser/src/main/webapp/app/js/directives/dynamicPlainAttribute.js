@@ -19,7 +19,7 @@
 
 'use strict';
 angular.module('self')
-        .directive('dynamicPlainAttribute', function ($filter) {
+        .directive('dynamicPlainAttribute', function () {
           return {
             restrict: 'E',
             templateUrl: 'views/dynamicPlainAttribute.html',
@@ -50,10 +50,10 @@ angular.module('self')
                       $scope.enumerationValues.push(enumerationValuesSplitted[i]);
                     }
                     //SYNCOPE-1024 enumeration keys mgmt
-                    if ( schema.enumerationKeys ) {
-                      var enumerationKeysSplitted = schema.enumerationKeys.toString().split( ";" );
-                      for ( var i = 0; i < enumerationKeysSplitted.length; i++ ) {
-                        $scope.enumerationKeys.push( enumerationKeysSplitted[i] );
+                    if (schema.enumerationKeys) {
+                      var enumerationKeysSplitted = schema.enumerationKeys.toString().split(";");
+                      for (var i = 0; i < enumerationKeysSplitted.length; i++) {
+                        $scope.enumerationKeys.push(enumerationKeysSplitted[i]);
                       }
                     }
                     $scope.user.plainAttrs[schema.key].values[index] = $scope.user.plainAttrs[schema.key].values[index]
@@ -100,29 +100,38 @@ angular.module('self')
                     $scope.isDate = function (x) {
                       return x instanceof Date;
                     };
-
-                    var dateInMs = $scope.user.plainAttrs[schema.key].values[index];
-                    var temporaryDate = new Date(dateInMs * 1);
-                    $scope.selectedDate = temporaryDate;
                     $scope.languageid = $rootScope.languages.selectedLanguage.id;
-                    $scope.languageFormat = $rootScope.languages.selectedLanguage.format;
+                    $scope.isDateOnly = schema.conversionPattern.indexOf("H") === -1
+                            && schema.conversionPattern.indexOf("h") === -1;
+                    $scope.languageFormat = $scope.isDateOnly
+                            ? $rootScope.languages.selectedLanguage.format.replace(" HH:mm", "")
+                            : $rootScope.languages.selectedLanguage.format;
                     $scope.languageCulture = $rootScope.languages.selectedLanguage.culture;
+                    // read date in milliseconds
+                    $scope.selectedDate = new Date($scope.user.plainAttrs[schema.key].values[index] * 1);
 
                     $scope.bindDateToModel = function (selectedDate, extendedDate) {
                       if (selectedDate) {
-                        var tmpdate = new Date(extendedDate);
-                        var milliseconds = tmpdate.getTime();
-                        $scope.user.plainAttrs[schema.key].values[index] = milliseconds;
+                        // save date in milliseconds
+                        $scope.user.plainAttrs[schema.key].values[index] = new Date(extendedDate).getTime();
                       }
                     };
                     break;
 
                   case "Boolean":
                     $scope.user.plainAttrs[schema.key].values[index] =
-                            $scope.user.plainAttrs[schema.key].values[index] === "true" ? true : false;
+                            $scope.user.plainAttrs[schema.key].values[index] === "true" ? "true" : "false";
                     break;
 
                 }
+              };
+
+              $scope.customReadonly = function (schemaKey) {
+                return  $rootScope.customForm != null
+                        && $rootScope.customForm["PLAIN"] != null
+                        && $rootScope.customForm["PLAIN"]["attributes"] != null
+                        && $rootScope.customForm["PLAIN"]["attributes"][schemaKey] != null
+                        && $rootScope.customForm["PLAIN"]["attributes"][schemaKey].readonly;
               };
 
               $scope.$watch(function () {

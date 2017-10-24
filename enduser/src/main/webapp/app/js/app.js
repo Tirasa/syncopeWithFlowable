@@ -119,10 +119,6 @@ app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$translate
               url: '/finish',
               templateUrl: 'views/user-form-finish.html'
             })
-            .state('success', {
-              url: '/success',
-              templateUrl: 'views/success.html'
-            })
             .state('update', {
               url: '/self/update',
               templateUrl: 'views/editUser.html',
@@ -375,10 +371,16 @@ app.controller('ApplicationController', ['$scope', '$rootScope', '$location', 'I
                 $rootScope.version = response.version;
                 $rootScope.pwdResetRequiringSecurityQuestions = response.pwdResetRequiringSecurityQuestions;
                 $rootScope.captchaEnabled = response.captchaEnabled;
+                $rootScope.maxUploadFileSizeMB = response.maxUploadFileSizeMB;
+                /* 
+                 * USER form customization JSON
+                 */
+                $rootScope.customForm = response.customForm;
               },
               function (response) {
                 console.error("Something went wrong while accessing info resource", response);
               });
+      /* <Extensions> */
       SAML2IdPService.getAvailableSAML2IdPs().then(
               function (response) {
                 $rootScope.saml2idps.available = response;
@@ -386,6 +388,7 @@ app.controller('ApplicationController', ['$scope', '$rootScope', '$location', 'I
               function (response) {
                 console.debug("No SAML 2.0 SP extension available", response);
               });
+      /* </Extensions> */
       /* 
        * configuration getters
        */
@@ -397,12 +400,15 @@ app.controller('ApplicationController', ['$scope', '$rootScope', '$location', 'I
       };
       $rootScope.saml2spExtAvailable = function () {
         return $rootScope.saml2idps.available.length > 0;
-      }
+      };
       $rootScope.saml2login = function () {
         window.location.href = '../saml2sp/login?idp=' + $rootScope.saml2idps.selected.entityID;
-      }
+      };
       $rootScope.getVersion = function () {
         return $rootScope.version;
+      };
+      $rootScope.getMaxUploadFileSizeMB = function () {
+        return $rootScope.maxUploadFileSizeMB;
       };
       /* 
        * USER Attributes sorting strategies
